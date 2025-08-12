@@ -38,27 +38,27 @@ const SatisfactoryMap: React.FC = () => {
     ctx.scale(mapState.scale, mapState.scale);
 
     if (mapImage) {
-      const mapWidth = 10000;
-      const mapHeight = 10000;
+      const mapWidth = 5000;
+      const mapHeight = 5000;
       ctx.drawImage(mapImage, -mapWidth/2, -mapHeight/2, mapWidth, mapHeight);
     } else {
       ctx.fillStyle = '#2a4a3a';
-      ctx.fillRect(-5000, -5000, 10000, 10000);
+      ctx.fillRect(-2500, -2500, 5000, 5000);
 
       ctx.strokeStyle = '#4a6a5a';
       ctx.lineWidth = 1 / mapState.scale;
       
-      for (let x = -5000; x <= 5000; x += 1000) {
+      for (let x = -2500; x <= 2500; x += 500) {
         ctx.beginPath();
-        ctx.moveTo(x, -5000);
-        ctx.lineTo(x, 5000);
+        ctx.moveTo(x, -2500);
+        ctx.lineTo(x, 2500);
         ctx.stroke();
       }
       
-      for (let y = -5000; y <= 5000; y += 1000) {
+      for (let y = -2500; y <= 2500; y += 500) {
         ctx.beginPath();
-        ctx.moveTo(-5000, y);
-        ctx.lineTo(5000, y);
+        ctx.moveTo(-2500, y);
+        ctx.lineTo(2500, y);
         ctx.stroke();
       }
     }
@@ -174,7 +174,7 @@ const SatisfactoryMap: React.FC = () => {
     img.onload = () => {
       setMapImage(img);
     };
-    img.src = '/map.png';
+    img.src = '/map.jpg';
   }, []);
 
   useEffect(() => {
@@ -218,20 +218,22 @@ const SatisfactoryMap: React.FC = () => {
       const ctx = canvas.getContext('2d');
       if (!ctx) return;
 
-      canvas.width = canvas.offsetWidth;
-      canvas.height = canvas.offsetHeight;
-
-      const mapWidth = 10000;
-      const mapHeight = 10000;
-      const minScaleX = canvas.width / mapWidth;
-      const minScaleY = canvas.height / mapHeight;
-      const fitScale = Math.min(minScaleX, minScaleY);
+      const mapWidth = 5000;
+      const mapHeight = 5000;
+      
+      canvas.width = mapWidth;
+      canvas.height = mapHeight;
       
       if (mapState.scale === 0.1) {
+        const rect = canvas.getBoundingClientRect();
+        const viewportScaleX = rect.width / mapWidth;
+        const viewportScaleY = rect.height / mapHeight;
+        const fitScale = Math.max(viewportScaleX, viewportScaleY);
+        
         setMapState({
           scale: fitScale,
-          offsetX: canvas.width / 2,
-          offsetY: canvas.height / 2
+          offsetX: mapWidth / 2,
+          offsetY: mapHeight / 2
         });
       }
 
@@ -282,18 +284,21 @@ const SatisfactoryMap: React.FC = () => {
     if (!canvas) return;
 
     const rect = canvas.getBoundingClientRect();
-    const mouseX = e.clientX - rect.left;
-    const mouseY = e.clientY - rect.top;
+    const mouseX = (e.clientX - rect.left) * (canvas.width / rect.width);
+    const mouseY = (e.clientY - rect.top) * (canvas.height / rect.height);
 
     const zoomFactor = e.deltaY > 0 ? 0.9 : 1.1;
     
-    const mapWidth = 10000;
-    const mapHeight = 10000;
-    const minScaleX = canvas.width / mapWidth;
-    const minScaleY = canvas.height / mapHeight;
-    const minScale = Math.min(minScaleX, minScaleY);
+    const mapWidth = 5000;
+    const mapHeight = 5000;
     
-    const newScale = Math.max(minScale, Math.min(5, mapState.scale * zoomFactor));
+    // Calculate minimum scale to ensure map fills the viewport
+    const viewportScaleX = rect.width / mapWidth;
+    const viewportScaleY = rect.height / mapHeight;
+    const minScale = Math.max(viewportScaleX, viewportScaleY);
+    const maxScale = 3;
+    
+    const newScale = Math.max(minScale, Math.min(maxScale, mapState.scale * zoomFactor));
 
     setMapState(prev => ({
       ...prev,
@@ -307,16 +312,17 @@ const SatisfactoryMap: React.FC = () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     
-    const mapWidth = 10000;
-    const mapHeight = 10000;
-    const minScaleX = canvas.width / mapWidth;
-    const minScaleY = canvas.height / mapHeight;
-    const fitScale = Math.min(minScaleX, minScaleY);
+    const mapWidth = 5000;
+    const mapHeight = 5000;
+    const rect = canvas.getBoundingClientRect();
+    const viewportScaleX = rect.width / mapWidth;
+    const viewportScaleY = rect.height / mapHeight;
+    const fitScale = Math.max(viewportScaleX, viewportScaleY);
     
     setMapState({
       scale: fitScale,
-      offsetX: canvas.width / 2,
-      offsetY: canvas.height / 2
+      offsetX: mapWidth / 2,
+      offsetY: mapHeight / 2
     });
   };
 
@@ -479,8 +485,8 @@ const SatisfactoryMap: React.FC = () => {
                 const rasterX = ((xMax - adjustedMappingBoundEast) + x) * xRatio;
                 const rasterY = (((yMax - adjustedMappingBoundNorth) + y) * yRatio) - totalBackgroundSize;
                 
-                // Convert to our 10000x10000 coordinate system
-                const mapScale = 10000 / totalBackgroundSize;
+                // Convert to our 5000x5000 coordinate system
+                const mapScale = 5000 / totalBackgroundSize;
                 
                 // Log first few collectibles for debugging coordinates and types
                 if (extractedCollectibles.length < 5) {
@@ -489,16 +495,16 @@ const SatisfactoryMap: React.FC = () => {
                     gamePosition: { x, y, z },
                     rasterPosition: { x: rasterX, y: rasterY },
                     finalMapPosition: { 
-                      x: rasterX * mapScale - 5000, 
-                      y: -rasterY * mapScale - 5000 
+                      x: rasterX * mapScale - 2500, 
+                      y: -rasterY * mapScale - 2500 
                     },
                     isCollected
                   });
                 }
                 
                 extractedCollectibles.push({
-                  x: rasterX * mapScale - 5000,  // Center on our coordinate system
-                  y: -rasterY * mapScale - 5000, // Flip Y and center
+                  x: rasterX * mapScale - 2500,  // Center on our coordinate system
+                  y: -rasterY * mapScale - 2500, // Flip Y and center
                   z: z / 100, // Convert to meters like SC-InteractiveMap
                   className: itemType,
                   isCollected: isCollected
@@ -535,108 +541,15 @@ const SatisfactoryMap: React.FC = () => {
 
   return (
     <div className="satisfactory-map-container">
-      <div style={{ 
-        position: 'absolute', 
-        top: 20, 
-        right: 20, 
-        zIndex: 1000,
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '10px'
-      }}>
-        <div style={{ 
-          padding: '12px 16px', 
-          background: 'rgba(0,123,255,0.9)', 
-          color: 'white', 
-          borderRadius: '8px',
-          backdropFilter: 'blur(10px)',
-          border: '1px solid rgba(0,123,255,0.3)',
-          boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
-          fontSize: '14px',
-          fontWeight: '500'
-        }}>
-          📂 Auto-loading map.sav...
-        </div>
-        {error && (
-          <div style={{ 
-            padding: '12px 16px', 
-            background: 'rgba(220, 53, 69, 0.9)', 
-            color: 'white', 
-            borderRadius: '8px',
-            backdropFilter: 'blur(10px)',
-            border: '1px solid rgba(220, 53, 69, 0.3)',
-            boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
-            fontSize: '14px',
-            fontWeight: '500'
-          }}>
-            {error}
-          </div>
-        )}
-        {collectibles.length > 0 && (
-          <div style={{ 
-            padding: '12px 16px', 
-            background: 'rgba(40, 167, 69, 0.9)', 
-            color: 'white', 
-            borderRadius: '8px',
-            backdropFilter: 'blur(10px)',
-            border: '1px solid rgba(40, 167, 69, 0.3)',
-            boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
-            fontSize: '14px',
-            fontWeight: '500'
-          }}>
-            ✓ Collectibles loaded: {collectibles.length}
-            <br />
-            📦 Collected: {collectibles.filter(c => c.isCollected).length}
-            <br />
-            🎯 Remaining: {collectibles.filter(c => !c.isCollected).length}
-          </div>
-        )}
-      </div>
-      
-      <div style={{
-        position: 'absolute',
-        top: 20,
-        left: 20,
-        zIndex: 1000,
-        background: 'rgba(0,0,0,0.8)',
-        color: 'white',
-        padding: '12px 16px',
-        borderRadius: '8px',
-        backdropFilter: 'blur(10px)',
-        border: '1px solid rgba(255,255,255,0.1)',
-        boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
-        fontSize: '14px',
-        fontWeight: '500'
-      }}>
-        <div>🔍 Scale: {mapState.scale.toFixed(2)}x</div>
-        <div>📍 Position: ({mapState.offsetX.toFixed(0)}, {mapState.offsetY.toFixed(0)})</div>
-        <button 
-          onClick={resetView} 
-          style={{ 
-            marginTop: '8px',
-            padding: '6px 12px',
-            background: 'rgba(0,123,255,0.8)',
-            color: 'white',
-            border: 'none',
-            borderRadius: '4px',
-            cursor: 'pointer',
-            fontSize: '12px',
-            fontWeight: '500',
-            transition: 'background-color 0.2s'
-          }}
-          onMouseOver={(e) => e.currentTarget.style.background = 'rgba(0,123,255,1)'}
-          onMouseOut={(e) => e.currentTarget.style.background = 'rgba(0,123,255,0.8)'}
-        >
-          🎯 Reset View
-        </button>
-      </div>
       <canvas
         ref={canvasRef}
         style={{
-          width: '100%',
-          height: '100%',
-          cursor: isDragging ? 'grabbing' : 'grab',
-          border: '1px solid #ccc'
+          width: '5000px',
+          height: '5000px',
+          aspectRatio: '1',
+          maxWidth: '100vw',
+          maxHeight: '100vh',
+          objectFit: 'contain'
         }}
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
@@ -644,11 +557,6 @@ const SatisfactoryMap: React.FC = () => {
         onMouseLeave={handleMouseUp}
         onWheel={handleWheel}
       />
-      <div style={{ position: 'absolute', top: 10, left: 10, background: 'rgba(0,0,0,0.7)', color: 'white', padding: '10px', borderRadius: '5px' }}>
-        <div>Scale: {mapState.scale.toFixed(2)}</div>
-        <div>Offset: ({mapState.offsetX.toFixed(0)}, {mapState.offsetY.toFixed(0)})</div>
-        <button onClick={resetView} style={{ marginTop: '5px' }}>Reset View</button>
-      </div>
     </div>
   );
 };
