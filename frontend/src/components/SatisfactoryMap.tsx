@@ -540,9 +540,10 @@ const SatisfactoryMap: React.FC = () => {
   }, []);
 
   return (
-    <div className="satisfactory-map-container">
+    <div className="relative w-[min(80vw,80vh)] h-[min(80vw,80vh)] border-2 border-white/20 rounded-lg shadow-2xl overflow-hidden bg-gradient-radial from-satisfactory-map to-satisfactory-mapDark">
       <canvas
         ref={canvasRef}
+        className="w-full h-full object-contain"
         style={{
           width: '5000px',
           height: '5000px',
