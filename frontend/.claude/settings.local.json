@@ -3,7 +3,10 @@
     "allow": [
       "Bash(mv:*)",
       "Bash(rm:*)",
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:static.satisfactory-calculator.com)",
+      "Bash(cp:*)"
     ],
     "deny": [],
     "ask": []

@@ -2,6 +2,8 @@
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+This project was supported via data by: https://github.com/GreyHak/sat_sav_pars and https://github.com/greeny/SatisfactoryTool
+
 ## Available Scripts
 
 In the project directory, you can run:

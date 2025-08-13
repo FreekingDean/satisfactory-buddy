@@ -1,0 +1,64 @@
+/* MapMarker Component Styles */
+
+.map-markers {
+  @apply absolute inset-0 pointer-events-none;
+}
+
+.map-marker {
+  @apply absolute pointer-events-auto cursor-pointer;
+  transition: transform 0.2s ease;
+}
+
+.map-marker:hover {
+  transform: translate(-50%, -50%) scale(1.2);
+}
+
+.marker-icon {
+  @apply w-4 h-4;
+}
+
+.map-marker--resource .marker-icon {
+  @apply w-6 h-6;
+}
+
+.map-marker--building .marker-icon {
+  @apply w-8 h-8;
+}
+
+.marker-dot {
+  @apply rounded-full;
+  width: 8px;
+  height: 8px;
+}
+
+.marker-dot--resource {
+  width: 12px;
+  height: 12px;
+  background: #f97316;
+}
+
+.marker-dot--collectible {
+  background: #06b6d4;
+}
+
+.marker-dot--building {
+  width: 16px;
+  height: 16px;
+  background: #8b5cf6;
+}
+
+.map-marker--resource .marker-dot--resource {
+  background: #22c55e; /* pure */
+}
+
+.map-marker--resource[data-purity="normal"] .marker-dot--resource {
+  background: #eab308; /* normal */
+}
+
+.map-marker--resource[data-purity="impure"] .marker-dot--resource {
+  background: #f97316; /* impure */
+}
+
+.map-marker--collectible[data-collected="true"] .marker-dot--collectible {
+  background: #6b7280; /* collected */
+}

@@ -1,10 +1,10 @@
 import React, { useEffect } from 'react';
-import { CollectibleData, MapState } from '../types/map';
+import { CollectibleMarker, MapState } from '../types/map';
 import { renderCollectible } from './CollectibleRenderer';
 
 interface CollectibleComponentProps {
   id: string;
-  data: CollectibleData;
+  data: CollectibleMarker;
   mapState: MapState;
   collectibleIcons: Map<string, HTMLImageElement>;
   onRegisterDraw: (id: string, drawFn: (ctx: CanvasRenderingContext2D) => void) => void;

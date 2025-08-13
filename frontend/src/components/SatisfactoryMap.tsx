@@ -1,91 +1,101 @@
-import React, { useRef, useEffect, useState, useCallback } from 'react';
-import { drawMapBackground, calculateFitScale } from '../utils/canvas';
-import { useMapControls } from '../hooks/useMapControls';
-import { useCanvasRenderer } from '../hooks/useCanvasRenderer';
+import React, { useState, useEffect } from 'react';
 import { useSaveFileLoader } from '../hooks/useSaveFileLoader';
 import { useIconLoader } from '../hooks/useIconLoader';
-import CollectiblesRenderer from './CollectiblesRenderer';
+import Map from './Map';
+import CollectibleMarkers from './CollectibleMarkers';
+import ResourceMarkers from './ResourceMarkers';
+import './SatisfactoryMap.css';
 
 const SatisfactoryMap: React.FC = () => {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [mapImage, setMapImage] = useState<HTMLImageElement | null>(null);
-
-  const { mapState, setMapState, handleMouseDown, handleMouseMove, handleMouseUp, handleWheel } = useMapControls({ canvasRef });
-  const { registerDrawFunction, unregisterDrawFunction, renderAll } = useCanvasRenderer();
   const { collectibles, error } = useSaveFileLoader();
   const { collectibleIcons } = useIconLoader();
+  const [resourceMappings, setResourceMappings] = useState<Record<string, any>>({});
+  const [mapPoints, setMapPoints] = useState<any[]>([]);
 
-  const drawMap = useCallback((ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement) => {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    
-    ctx.save();
-    ctx.translate(mapState.offsetX, mapState.offsetY);
-    ctx.scale(mapState.scale, mapState.scale);
-
-    drawMapBackground(ctx, mapImage);
-    renderAll(ctx);
-    
-    ctx.restore();
-  }, [mapState, mapImage, renderAll]);
-
-  // Load map image
   useEffect(() => {
-    const img = new Image();
-    img.onload = () => setMapImage(img);
-    img.src = '/map.jpg';
+    const loadData = async () => {
+      try {
+        const [mappingsResponse, pointsResponse] = await Promise.all([
+          fetch('/data/mappings.json'),
+          fetch('/data/mappoints.json')
+        ]);
+        
+        const mappings = await mappingsResponse.json();
+        const points = await pointsResponse.json();
+        
+        setResourceMappings(mappings);
+        setMapPoints(points);
+      } catch (err) {
+        console.error('Failed to load data:', err);
+      }
+    };
+    
+    loadData();
   }, []);
 
-
-  // Canvas setup and drawing
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const resizeCanvas = () => {
-      const ctx = canvas.getContext('2d');
-      if (!ctx) return;
-
-      const rect = canvas.getBoundingClientRect();
-      canvas.width = rect.width;
-      canvas.height = rect.height;
-      
-      if (mapState.scale === 0.1) {
-        const fitScale = calculateFitScale(rect);
-        setMapState({
-          scale: fitScale,
-          offsetX: rect.width / 2,
-          offsetY: rect.height / 2
-        });
-      }
-
-      drawMap(ctx, canvas);
-    };
-
-    resizeCanvas();
-    const resizeObserver = new ResizeObserver(resizeCanvas);
-    resizeObserver.observe(canvas);
-    
-    return () => resizeObserver.disconnect();
-  }, [drawMap, mapState.scale, setMapState]);
+  if (error) {
+    return (
+      <div className="satisfactory-app">
+        <div className="error-container">
+          <div className="error-message">
+            Error loading data: {error}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="relative w-[min(80vw,80vh)] h-[min(80vw,80vh)] border-2 border-white/20 rounded-lg shadow-2xl overflow-hidden bg-gradient-radial from-satisfactory-map to-satisfactory-mapDark">
-      <canvas
-        ref={canvasRef}
-        className="w-full h-full"
-        onMouseDown={handleMouseDown}
-        onMouseMove={handleMouseMove}
-        onMouseUp={handleMouseUp}
-        onMouseLeave={handleMouseUp}
-        onWheel={handleWheel}
-      />
-      <CollectiblesRenderer
-        collectibles={collectibles}
-        mapState={mapState}
-        collectibleIcons={collectibleIcons}
-        onRegisterDraw={registerDrawFunction}
-        onUnregisterDraw={unregisterDrawFunction}
-      />
+    <div className="satisfactory-app">
+      <div className="app-container">
+        {/* Header */}
+        <div className="app-header">
+          <h1 className="app-header-title">
+            Satisfactory Buddy
+          </h1>
+          <p className="app-header-subtitle">
+            Interactive map for resource exploration and planning
+          </p>
+        </div>
+
+        {/* Map Container */}
+        <div className="map-wrapper">
+          <Map>
+            <CollectibleMarkers 
+              collectibles={collectibles} 
+              icons={collectibleIcons}
+            />
+            <ResourceMarkers 
+              resources={mapPoints}
+              mappings={resourceMappings}
+              icons={collectibleIcons}
+            />
+          </Map>
+        </div>
+
+        {/* Stats Panel */}
+        <div className="stats-grid">
+          <div className="stats-card">
+            <div className="stats-card-label">Collectibles</div>
+            <div className="stats-card-value">{collectibles.length}</div>
+            <div className="stats-card-description">Total items</div>
+          </div>
+          
+          <div className="stats-card">
+            <div className="stats-card-label">Resources</div>
+            <div className="stats-card-value">{mapPoints.length}</div>
+            <div className="stats-card-description">Resource nodes</div>
+          </div>
+          
+          <div className="stats-card stats-card--status">
+            <div className="stats-card-label">Status</div>
+            <div className="status-row">
+              <div className="status-indicator"></div>
+              <div className="status-text">Live data</div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

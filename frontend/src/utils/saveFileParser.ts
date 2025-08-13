@@ -1,4 +1,4 @@
-import { CollectibleData } from '../types/map';
+import { CollectibleMarker } from '../types/map';
 import { isCollectible } from './buildingIcons';
 
 export async function loadSaveFile(): Promise<any> {
