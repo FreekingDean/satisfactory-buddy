@@ -37,8 +37,8 @@ export function useMapControls({ canvasRef }: UseMapControlsProps) {
 
     setMapState(prev => ({
       ...prev,
-      offsetX: newPosition.x,
-      offsetY: newPosition.y
+      offsetX: Math.round(newPosition.x),
+      offsetY: Math.round(newPosition.y)
     }));
 
     setLastMousePos({ x: e.clientX, y: e.clientY });
@@ -73,8 +73,8 @@ export function useMapControls({ canvasRef }: UseMapControlsProps) {
 
     setMapState({
       scale: newScale,
-      offsetX: constrainedPosition.x,
-      offsetY: constrainedPosition.y
+      offsetX: Math.round(constrainedPosition.x),
+      offsetY: Math.round(constrainedPosition.y)
     });
   }, [mapState, canvasRef]);
 

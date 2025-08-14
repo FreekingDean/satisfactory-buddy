@@ -46,15 +46,28 @@ const SatisfactoryMap: React.FC = () => {
       if (!ctx) return;
 
       const rect = canvas.getBoundingClientRect();
-      canvas.width = rect.width;
-      canvas.height = rect.height;
+      const dpr = window.devicePixelRatio || 1;
+      
+      // Set canvas size accounting for device pixel ratio
+      canvas.width = Math.round(rect.width * dpr);
+      canvas.height = Math.round(rect.height * dpr);
+      
+      // Scale context to match device pixel ratio
+      ctx.scale(dpr, dpr);
+      
+      // Set CSS size to actual display size
+      canvas.style.width = `${rect.width}px`;
+      canvas.style.height = `${rect.height}px`;
+      
+      // Ensure crisp pixel rendering
+      ctx.imageSmoothingEnabled = false;
       
       if (mapState.scale === 0.1) {
         const fitScale = calculateFitScale(rect);
         setMapState({
           scale: fitScale,
-          offsetX: rect.width / 2,
-          offsetY: rect.height / 2
+          offsetX: Math.round(rect.width / 2),
+          offsetY: Math.round(rect.height / 2)
         });
       }
 

@@ -16,10 +16,11 @@ export function useIconLoader() {
       
       for (const filename of iconFilenames) {
         const img = new Image();
-        img.src = `/icons/${filename}`;
+        img.src = `/items/${filename}`;
         
         await new Promise<void>((resolve) => {
           img.onload = () => {
+            console.log(`Loaded collectible icon: ${filename}`);
             iconMap.set(filename, img);
             resolve();
           };

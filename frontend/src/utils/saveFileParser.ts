@@ -26,12 +26,12 @@ function isItemCollected(item: any): boolean {
          (item.properties && item.properties.mIsLooted === true);
 }
 
-function convertCoordinates(x: number, y: number): { x: number; y: number } {
+export function convertCoordinates(x: number, y: number): { x: number; y: number } {
   // Simplified coordinate conversion
   // Satisfactory world is roughly -400000 to +400000 for x and y
   // Convert to our -2500 to +2500 coordinate system
-  const mapX = (x / 400000) * 2500;
-  const mapY = -(y / 400000) * 2500; // Flip Y axis
+  const mapX = (x/12.2)-350;
+  const mapY = (y/12.2); // Flip Y axis
   
   return { x: mapX, y: mapY };
 }
