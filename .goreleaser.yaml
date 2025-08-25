@@ -15,6 +15,8 @@ builds:
       - CGO_ENABLED=0
 dockers:
   - id: ghcr.io
+    extra_files:
+      - "frontend"
     image_templates:
       - "ghcr.io/freekingdean/{{ .ProjectName }}:{{ .Major }}.{{ .Minor }}.{{ .Patch }}"
       - "ghcr.io/freekingdean/{{ .ProjectName }}:{{ .Major }}.{{ .Minor }}"
