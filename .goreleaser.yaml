@@ -3,7 +3,7 @@ version: 2
 builds:
   - id: default
     binary: satisfactory-buddy
-    main: ./cmd/metrics
+    main: ./cmd/satisfactory-buddy
     goos:
       - linux
       - darwin
