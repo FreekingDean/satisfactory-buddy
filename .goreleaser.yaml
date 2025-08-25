@@ -1,0 +1,24 @@
+project_name: satisfactory-buddy
+version: 2
+builds:
+  - id: default
+    binary: satisfactory-buddy
+    main: ./cmd/metrics
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
+    env:
+      - CGO_ENABLED=0
+dockers:
+  - id: ghcr.io
+    image_templates:
+      - "ghcr.io/freekingdean/{{ .ProjectName }}:{{ .Major }}.{{ .Minor }}.{{ .Patch }}"
+      - "ghcr.io/freekingdean/{{ .ProjectName }}:{{ .Major }}.{{ .Minor }}"
+      - "ghcr.io/freekingdean/{{ .ProjectName }}:{{ .Major }}"
+      - "ghcr.io/freekingdean/{{ .ProjectName }}:{{ .Tag }}"
+      - "ghcr.io/freekingdean/{{ .ProjectName }}:latest"
+

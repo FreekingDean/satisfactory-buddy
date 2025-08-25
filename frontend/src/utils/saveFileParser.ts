@@ -1,20 +1,11 @@
 import { CollectibleData } from '../types/map';
 import { isCollectible } from './buildingIcons';
+import { readFileSync } from 'fs';
 
 export async function loadSaveFile(): Promise<any> {
-  const response = await fetch('/map.sav');
-  if (!response.ok) {
-    throw new Error(`Failed to fetch save file: ${response.statusText}`);
-  }
+  // load file from public/map.sav
   
-  const arrayBuffer = await response.arrayBuffer();
-  console.log('Save file loaded, size:', arrayBuffer.byteLength);
-  
-  const { Parser } = await import('@etothepii/satisfactory-file-parser');
-  const saveData = Parser.ParseSave('map', arrayBuffer);
-  console.log('Save data parsed successfully:', saveData);
-  
-  return saveData;
+  return {};
 }
 
 function isItemCollected(item: any): boolean {
