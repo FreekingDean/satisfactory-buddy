@@ -53,6 +53,10 @@ func (mc *MetricsCollector) updatePowerMetrics() {
 
 func (mc *MetricsCollector) updatePowerMetric(obj *savefile.GameObject) {
 	parent := mc.saveFile.GetGameObject(obj.ParentEntityName)
+	if parent == nil {
+		log.Printf("Warning: Parent entity not found for power info component %s", obj.InstanceName)
+		return
+	}
 	circuit := "-1"
 	for _, compID := range parent.Components {
 		component := mc.saveFile.GetGameObject(compID.PathName)
